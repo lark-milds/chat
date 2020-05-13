@@ -1,0 +1,13 @@
+{
+    "name": "PWA chat sample",
+    "short_name": "chat",
+    "display": "standalone",
+    "start_url": "/chat/index.html",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        }
+    ]
+}
