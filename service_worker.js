@@ -1,7 +1,7 @@
 // キャッシュファイルの指定
 var CACHE_NAME = 'pwa-chat-sample-caches';
 var urlsToCache = [
-    '/192.168.0.243/chat/',
+    '/lark-milds.github.io/chat/',
 ];
 
 // インストール処理
