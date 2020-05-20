@@ -1,69 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no,user-scalable=no,viewport-fit=cover">
     <title>SkyWay - P2P Data example</title>
     <link rel="apple-touch-icon" href="icon.png" />
-    <link href="splashscreens/iphone5_splash.png" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/iphone6_splash.png" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/iphoneplus_splash.png" media="screen and (device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/iphonex_splash.png" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/iphonexr_splash.png" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/iphonexsmax_splash.png" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/ipad_splash.png" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/ipadpro1_splash.png" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/ipadpro3_splash.png" media="screen and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
-    <link href="splashscreens/ipadpro2_splash.png" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" rel="apple-touch-startup-image" />
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
-    <style>
-      @media (max-width: 500px){
-        .container {
-          width: 100%;
-        }
-        .p2p-data {
-          display: block;
-        }
-        div.info, div.message, .meta{
-          min-width: 100%;
-          float: left;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-messaging.js"></script>
   </head>
   <body>
-    <div class="container">
-      <h1 class="heading">P2P Data example</h1>
-      <p class="note">
-        Enter remote peer ID to connect.
-      </p>
-      <div class="p2p-data">
-        <div class="info">
-          <p>Your ID: <span id="js-local-id"></span></p>
-          <input type="text" placeholder="Remote Peer ID" id="js-remote-id">
-          <button id="js-connect-trigger">Connect</button>
-          <button id="js-close-trigger">Close</button>
-        </div>
-        <div class="message">
-          <pre class="messages" id="js-messages"></pre>
-          <input type="text" id="js-local-text">
-          <button id="js-send-trigger">Send</button>
-        </div>
-      </div>
-      <p class="meta" id="js-meta"></p>
+    <div class="col-sm-3"></div>
+
+    <div class="col-sm-6">
+      <h1 class="text-center">プッシュ通知の購読</h1>
+      <h2 id="newitem" class="text-center"></h2>
+      <button id="button" onclick="getSubscription()" class="btn center-block"></button>
     </div>
-    <script src="//cdn.webrtc.ecl.ntt.com/skyway-latest.js"></script>
-    <script src="key.js"></script>
-    <script src="script.js"></script>
+    <div class="col-sm-3"></div>
     <script>
-    if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service_worker.js').then(function(registration) {
-        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-    }).catch(function(err) {
-        console.log('ServiceWorker registration failed: ', err);
-    });
-    }
+
+      // Firebase のSDKを利用し、SenderIDを設定して初期化
+  
+      const config = {
+        messagingSenderId: "60153190602" //SenderIDを記述
+      };
+      firebase.initializeApp(config);
+      const messaging = firebase.messaging();
+      messaging.usePublicVapidKey("BAN-TmtVW7xT6qr75tdFSod0PCyMK3burak82qnU9pT1ZUh0okY1VlI3JRpmRc3b0q3PyN5Rl1l__eTq9kWQNKc"); // ウェブプッシュ証明書キーを記述
+  
+  // Service Worker ファイルを登録し、ボタン表示を行う
+      registSW();
+      initialButton();
+  
+      function initialButton() {
+        messaging.getToken().then(token => {
+          if (token) {
+            document.getElementById("button").innerText = "プッシュ通知を購読中";
+          } else {
+            document.getElementById("button").innerText = "プッシュ通知を受け取る";
+          }
+        }).catch(function (err) {
+          console.log('An error occurred while retrieving token. ', err);
+        });
+      }
+  
+  // トークンが未取得の場合 = プッシュ通知を未購読の場合、プッシュ通知の登録許可を行う
+  // すでに購読済みの場合、取得済みのFirebase用トークンを表示
+  
+      function getSubscription() {
+        messaging.getToken().then(token => {
+          if (!token) {
+            getNotification();
+          } else {
+            displayToken();
+          }
+        }).catch(function (err) {
+          console.log('An error occurred while retrieving token. ', err);
+        });
+      }
+  
+  //  Firebase のSDKを使い、プッシュ通知の購読処理を行う
+  
+      function getNotification() {
+        messaging.requestPermission().then(function () {
+          console.log('Notification permission granted.');
+          displayToken();
+          initialButton();
+        }).catch(function (err) {
+          console.log('Unable to get permission to notify.', err);
+        });
+      }
+  
+  //　トークン表示
+  
+      function displayToken() {
+        messaging.getToken().then(token => {
+          if (token) {
+            console.log(token);
+          } else {
+            console.log('No Instance ID token available. Request permission to generate one.');
+          }
+        }).catch(function (err) {
+          console.log('An error occurred while retrieving token. ', err);
+        });
+      }
+  
+  //　Service Worker ファイルを登録
+  
+      function registSW() {
+  
+        // Service Worker ファイル「firebaes-messaging-sw.js」を登録する
+  
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/firebase-messaging-sw.js')
+              .then(function (registration) {
+                console.log('firebase-messaging-sw.js registration successful with scope: ', registration.scope);
+              }, function (err) {
+                console.log('firebase-messaging-sw.js registration failed: ', err);
+              });
+          });
+        }
+      }
     </script>
   </body>
 </html>

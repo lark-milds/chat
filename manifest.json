@@ -1,9 +1,9 @@
 {
-    "name": "崎Chat",
-    "short_name": "崎Chat",
-    "description": "ザキヤマのチャットです。",
+    "name": "崎Notice",
+    "short_name": "崎Notice",
+    "description": "ザキヤマの通知です。",
     "display": "standalone",
-    "start_url": "https://lark-milds.github.io/chat/index.html",
+    "start_url": "index.html",
     "background_color": "#000000",
     "theme_color": "#ffffff",
     "icons": [
@@ -12,5 +12,6 @@
             "sizes": "192x192",
             "type": "image/png"
         }
-    ]
+    ],
+    "gcm_sender_id": "103953800507"
 }
